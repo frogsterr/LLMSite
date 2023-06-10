@@ -10,6 +10,7 @@ import sentence_transformers
 from langchain.vectorstores import Chroma
 from langchain.document_loaders import OnlinePDFLoader
 import streamlit as st
+from PyPDF2 import PdfReader
 
 
 
@@ -32,15 +33,15 @@ parser = PydanticOutputParser(pydantic_object=Report)
 
 def pdfToChunks(file, chunk_size, chunk_overlap):
 
-    loader = PyPDFLoader(file)
-    pages = loader.load_and_split()
+    loader = PdfReader(file)
+    pages = loader.pages
 
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=chunk_size,
         chunk_overlap=chunk_overlap,
     )
 
-    report_list = [pages[page].page_content for page in range(len(pages))]
+    report_list = [pages[page].extract_text() for page in range(len(pages))]
     texts = text_splitter.create_documents(report_list)
 
     return texts
@@ -51,8 +52,6 @@ def vectorStore(texts):
 
     embeddings = OpenAIEmbeddings()
     docsearch = Chroma.from_texts(texts, embeddings)
-
-print(pdfToChunks('example.pdf', 200,20))
 
 
 
