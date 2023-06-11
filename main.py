@@ -6,7 +6,7 @@ from langchain.vectorstores import Chroma
 from PyPDF2 import PdfReader
 from langchain.agents.agent_toolkits import (create_vectorstore_agent, VectorStoreToolkit, VectorStoreInfo)
 
-os.environ['OPENAI_API_KEY'] = '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'
+os.environ['OPENAI_API_KEY'] = 'Your Key!'
 llm = OpenAI(model_name='text-davinci-003', temperature=.7)
 
 # Converts PDF into list of string pages
