@@ -66,8 +66,8 @@ class vectorStore():
         self.vectordb = Chroma.from_documents(documents=texts, embedding=self.embeddings)
 
         self.vectorstore_info = VectorStoreInfo(
-            name="Goldman Sachs Report",
-            description="a banking annual report as a pdf",
+            name="Document",
+            description="a description of the document",
             vectorstore = self.vectordb
         )
 
