@@ -1,7 +1,8 @@
+import os
 from langchain.prompts import PromptTemplate
 from langchain.llms import OpenAI
 from langchain.embeddings import OpenAIEmbeddings
-from langchain.document_loaders import PyPDFLoader
+from langchain import VectorDBQA
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.output_parsers import PydanticOutputParser
 from langchain.chains import LLMChain
@@ -11,16 +12,26 @@ from langchain.vectorstores import Chroma
 from langchain.document_loaders import OnlinePDFLoader
 import streamlit as st
 from PyPDF2 import PdfReader
+from langchain.agents.agent_toolkits import (create_vectorstore_agent, VectorStoreToolkit, VectorStoreInfo)
 
 
 
-#llm = OpenAI(model_name='text-davinci-003', temperature=.9)
-#chain = LLMChain(llm=llm, prompt=prompt)
 
+
+os.environ['OPENAI_API_KEY'] = 'Your Key Here!'
+llm = OpenAI(model_name='text-davinci-003', temperature=.99)
+
+'''
+IGNORE
 prompt = PromptTemplate(
-    input_variables =["user_prompt"],
-    template="{user_prompt}"
+    input_variables=["{level}, {keywords}"],
+    template= "Build a series of questions that mimic an {level}-level exam "
+             "based on the keywords/concepts given. Do not write anything but the questions."
+             " At the end of each question, write the  ~ symbol."
+             " Right after the question, write the answer. At the end of the answer"
+             " write the * symbol. Keywords/Concepts: {keywords}"
 )
+'''
 
 class Report(BaseModel):
     title: str = Field(description="title of the document")
@@ -48,10 +59,32 @@ def pdfToChunks(file, chunk_size, chunk_overlap):
 
 # Use OpenAI embeddings and send vectors to ChromaDB
 
-def vectorStore(texts):
+class vectorStore():
+    def __init__(self, texts, llm):
 
-    embeddings = OpenAIEmbeddings()
-    docsearch = Chroma.from_texts(texts, embeddings)
+        self.embeddings = OpenAIEmbeddings()
+        self.vectordb = Chroma.from_documents(documents=texts, embedding=self.embeddings)
+
+        self.vectorstore_info = VectorStoreInfo(
+            name="Goldman Sachs Report",
+            description="a banking annual report as a pdf",
+            vectorstore = self.vectordb
+        )
+
+        self.toolkit = VectorStoreToolkit(vectorstore_info=self.vectorstore_info)
+
+        # For Query style 1.
+        self.agent_executor = create_vectorstore_agent(
+            llm=llm,
+            toolkit=self.toolkit,
+            verbose=True
+        )
+
+        # For Query style 2. Question and Answer chain
+        self.qachain = VectorDBQA.from_chain_type(llm=llm, chain_type="stuff", vectorstore=self.vectordb)
+
+
+
 
 
 
