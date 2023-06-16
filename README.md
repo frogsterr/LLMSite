@@ -1,4 +1,4 @@
-# sift.ai
+# sift.ai (Prototype)
 
 Use boring homework reading to study effectively!
 Heres an example:
