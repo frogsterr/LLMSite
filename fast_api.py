@@ -16,7 +16,7 @@ class UserInput(BaseModel):
 
 app = FastAPI()
 
-# Converts user input into agent response
+# Returns Parsed LLM Agent Response
 @app.post("/model")
 def operate(input: UserInput):
     # Convert Pdf-list to Document Objects
