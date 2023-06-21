@@ -5,8 +5,11 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import Chroma
 from PyPDF2 import PdfReader
 from langchain.agents.agent_toolkits import (create_vectorstore_agent, VectorStoreToolkit, VectorStoreInfo)
+from dotenv import load_dotenv
 
-os.environ['OPENAI_API_KEY'] = 'Your Key Here!'
+# Load environment variables from .env file
+load_dotenv()
+
 llm = OpenAI(model_name='text-davinci-003', temperature=.7)
 
 # Converts PDF into list of string pages
